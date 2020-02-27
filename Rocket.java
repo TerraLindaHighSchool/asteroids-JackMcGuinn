@@ -1,3 +1,5 @@
+
+
 import greenfoot.*;
 
 /**
@@ -14,18 +16,19 @@ public class Rocket extends SmoothMover
     private static final int gunReloadTime = 5;         // The minimum delay between firing the gun.
 
     private int reloadDelayCount;               // How long ago we fired the gun the last time.
+    private Vector acceleration;
     
     private GreenfootImage rocket = new GreenfootImage("rocket.png");    
     private GreenfootImage rocketWithThrust = new GreenfootImage("rocketWithThrust.png");
-
     /**
      * Initialise this rocket.
      */
     public Rocket()
     {
-        reloadDelayCount = 5;
-        addToVelocity(new Vector(180, .1));
-        
+        reloadDelayCount = 0;
+        addToVelocity(new Vector(150,.5));
+        acceleration = (new Vector(0, 0.3));
+        addToVelocity(new Vector(13, 0.3));
     }
 
     /**
@@ -34,47 +37,47 @@ public class Rocket extends SmoothMover
      */
     public void act()
     {
+        move();
         checkKeys();
         reloadDelayCount++;
-        move();
         checkCollision();
     }
     
-    /**
-     * Check whether there are any key pressed and react to them.
+      /**
+    * Check whether there are any key pressed and react to them.
      */
-    private void checkKeys() 
+     private void checkKeys() 
     {
+        ignite(Greenfoot.isKeyDown("up"));
+        
         if (Greenfoot.isKeyDown("space")) 
         {
             fire();
         }
-        if (Greenfoot.isKeyDown("left")) 
+         if (Greenfoot.isKeyDown("left")) 
         {
-          turn (-5);  
-            
-        }  
-        if (Greenfoot.isKeyDown("right"))
-        {
-           turn (5); 
-        } 
-        if (Greenfoot.isKeyDown("up"))
-        {
-          move(2);
+            turn(-5);
         }
-        ignite(Greenfoot.isKeyDown("up"));
+         if (Greenfoot.isKeyDown("right")) 
+        {
+            turn(5);
+        }
     }
-    public void ignite (boolean boosterOn)
+    
+    private void ignite(boolean boosterOn)
     {
-       if (boosterOn)
-       {
-           setImage(rocketWithThrust);
+        if (boosterOn) 
+        {
+            setImage(rocketWithThrust);
+            acceleration.setDirection(getRotation());
+            addToVelocity(acceleration);
         }
-       else
-       {
-           setImage(rocket);
-       }   
+        else
+        {
+            setImage(rocket);
+        }
     }
+    
     /**
      * Fire a bullet if the gun is ready.
      */
@@ -88,17 +91,26 @@ public class Rocket extends SmoothMover
             reloadDelayCount = 0;
         }
     }
-    
     private void checkCollision()
     {
-        if( getOneIntersectingObject(Asteroid.class) != null)
-         {
-             World world = getWorld();
-             Explosion explosion = new Explosion();
-             world.addObject(explosion, getX() , getY());
-             world.removeObject(this);
-             Greenfoot.stop();
-             
-            }
-    }        
+      if( getOneIntersectingObject(Asteroid.class) != null) 
+      { Space space = (Space) getWorld();
+        space.addObject(new Explosion(),getX(), getY());
+        space.removeObject(this);
+        space.gameOver();
+      }
+    }
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
