@@ -98,6 +98,7 @@ public class Rocket extends SmoothMover
         space.addObject(new Explosion(),getX(), getY());
         space.removeObject(this);
         space.gameOver();
+        Greenfoot.stop();
       }
     }
 
